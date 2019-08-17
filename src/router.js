@@ -20,7 +20,7 @@ export default new VueRouter({
         {
           path: '/admin/words',
           name: 'words',
-          component: () => import('./admin/views/words'),
+          component: () => import('./admin/views/Words'),
         }
       ]
     }
