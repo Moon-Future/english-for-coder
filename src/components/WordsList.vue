@@ -132,6 +132,7 @@ export default {
       }
       &.active {
         color: $color-red;
+        font-weight: bold;
       }
     }
   }
