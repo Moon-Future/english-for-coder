@@ -15,13 +15,12 @@
           <span class="word-mean">{{ word.mean }}</span>
         </template>
         <div class="word-examples">
-          <div class="examples-item">
-            <p>1. an example that was fundamental to the argument.</p>
-            <span>论据中的一个主要例证</span>
+          <div v-for="(example, i) in word.examples" :key="example.id" class="examples-item">
+            <p>{{ i + 1 }}. {{ example.en }}</p>
+            <span>{{ example.zh }}</span>
           </div>
-          <div class="examples-item">
-            <p>2. an example that was fundamental to the argument.an example that was fundamental to the argument.an example that was fundamental to the argument.an example that was fundamental to the argument.an example that was fundamental to the argument.</p>
-            <span>论据中的一个主要例证论据中的一个主要例证论据中的一个主要例证论据中的一个主要例证论据中的一个主要例证论据中的一个主要例证论据中的一个主要例证论据中的一个主要例证论据中的一个主要例证论据中的一个主要例证</span>
+          <div v-if="word.examples.length === 0">
+            <p>暂无实例</p>
           </div>
         </div>
       </el-collapse-item>
@@ -50,7 +49,6 @@ export default {
     this.$http.get(API.wordsList, {
       params: {letter: 'hot'}
     }).then(res => {
-      console.log(res.data)
       this.wordsList = res.data.data
     })
   },

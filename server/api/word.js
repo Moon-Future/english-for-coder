@@ -7,13 +7,24 @@ router.get('/wordsList', async (ctx) => {
   try {
     const data = ctx.request.query
     const letter = data.letter
-    let sql, result
+    let sql, res, temp ={}, result = []
     if (letter === 'hot') {
-      sql = `SELECT * FROM words WHERE counter >= 10`
+      sql = `SELECT a.id, a.word, a.letter, a.mean, a.pronounce, e.id AS eid, e.en, e.zh FROM words AS a LEFT JOIN examples AS e ON a.id = e.wordID AND e.off != 1 WHERE a.counter >= 10 AND a.off != 1`
     } else {
-      sql = `SELECT * FROM words WHERE letter = ?`
+      sql = `SELECT a.id, a.word, a.letter, a.mean, a.pronounce, e.id AS eid, e.en, e.zh FROM words AS a LEFT JOIN examples AS e ON a.id = e.wordID AND e.off != 1 WHERE  a.letter = ? AND a.off != 1`
     }
-    result = await query(sql, [letter])
+    res = await query(sql, [letter])
+
+    res.forEach(item => {
+      if (!temp[item.id]) {
+        temp[item.id] = {id: item.id, word: item.word, letter: item.letter, mean: item.mean, pronounce: item.pronounce, examples: [] }
+        result.push(temp[item.id])
+      }
+      if (item.eid) {
+        temp[item.id].examples.push({id: item.eid, en: item.en, zh: item.zh})
+      }
+    })
+
     ctx.body = {code: 200, data: result}
   } catch(err) {
     throw new Error(err)
@@ -37,9 +48,10 @@ router.post('/editWord', async (ctx) => {
     letter = word[0].toLocaleUpperCase()
     if (id) {
       if (data.operate === '3') { // 删除
-
-      } else { // 更新
-
+        await query(`UPDATE words SET off = 1 WHERE id = ?`, [id])
+        await query(`UPDATE examples SET off = 1 WHERE wordID = ?`, [id])
+      } else if (data.operate === '1') { // 更新
+        await query(`UPDATE words SET word = ?, letter = ?, mean = ?, pronounce = ?, updateTime = ? WHERE id = ?`, [word, letter, mean, pronounce, date, id])
       }
     } else {
       id = shortid.generate()
@@ -51,16 +63,15 @@ router.post('/editWord', async (ctx) => {
       const exid = example.id
       const en = example.en.trim()
       const zh = example.zh.trim()
-      if (example.operate === '3' && exid) { // 删除
-        await query(`DELETE FROM examples WHERE id = ?`, [exid])
-        continue
-      }
-      if (en === '') {
-        continue
-      }
-      if (exid) { // 更新
-
-      } else { // 新增
+      if (exid) {
+        if (example.operate === '3') { // 删除
+          await query(`UPDATE examples SET off = 1 WHERE id = ?`, [exid])
+        } else if (example.operate === '1') { // 更新
+          if (en === '') { continue }
+          await query(`UPDATE examples SET en = ?, zh = ?, updateTime = ? WHERE id = ?`, [en, zh, date, exid])
+        }
+      } else {
+        if (en === '') { continue }
         await query(`INSERT INTO examples (id, wordID, en, zh, createTime) VALUES (?, ?, ?, ?, ?)`, 
           [shortid.generate(), id, en, zh, date])
       }
