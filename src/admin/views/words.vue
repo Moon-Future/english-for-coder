@@ -24,15 +24,21 @@
         :key="i"
         :prop="field.prop"
         :label="field.label">
+        <template slot-scope="scope">
+          <span v-if="field.prop !== 'verify'">{{ scope.row[field.prop] }}</span>
+          <el-button v-else size="mini" :type="scope.row[field.prop] === 1 ? 'success' : 'info'" @click="changeVerigy(scope.row)">
+            {{ scope.row[field.prop] === 1 ? '已审核' : '未审核' }}
+          </el-button>
+        </template>
       </el-table-column>
-      <el-table-column label="操作">
+      <el-table-column label="操作" width="150px">
         <template slot-scope="scope">
           <el-button size="mini" @click="edit(scope.$index, scope.row)">编辑</el-button>
           <el-button size="mini" type="danger" @click="del(scope.$index, scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
-    <word-form :visiable="formVisiable" :form="form" @wordForm="handleForm"></word-form>
+    <word-form :visiable="formVisiable" :admin="true" :form="form" @wordForm="handleForm"></word-form>
   </div>
 </template>
 
@@ -53,7 +59,8 @@ export default {
         {prop: 'letter', label: '首字母'},
         {prop: 'mean', label: '词意'},
         {prop: 'pronounce', label: '发音'},
-        {prop: 'counter', label: '热度'}
+        {prop: 'counter', label: '热度'},
+        {prop: 'verify', label: '状态'}
       ],
       formVisiable: false,
       form: {
@@ -61,7 +68,8 @@ export default {
         mean: '',
         pronounce: '',
         examples: []
-      }
+      },
+      admin: true
     }
   },
   created() {
@@ -70,7 +78,7 @@ export default {
   methods: {
     getData() {
       this.$http.get(API.wordsList, {
-        params: {letter: 'hot'}
+        params: {letter: 'all', admin: true}
       }).then(res => {
         this.wordsList = res.data.data
       })
@@ -118,6 +126,27 @@ export default {
         })
       }).catch(() => {
         this.$message.info('已取消删除')          
+      });
+    },
+    changeVerigy(data) {
+      this.$confirm('改变审核状态?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        let verify = data.verify === 1 ? 0 : 1
+        this.$http.post(API.changeVerify, {
+          id: data.id, verify: verify
+        }).then(res => {
+          if (res.data.code === 200) {
+            this.$message.success(res.data.message)
+            data.verify = verify
+          } else {
+            this.$message.error(res.data.message)
+          }
+        })
+      }).catch(() => {
+        this.$message.info('已取消')          
       });
     }
   }

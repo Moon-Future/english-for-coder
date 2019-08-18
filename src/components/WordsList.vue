@@ -1,10 +1,16 @@
 <template>
   <div class="wordsls-container">
     <div class="alphabet-wrapper">
-      <Iconfont class="hot-icon active"></Iconfont>
-      <span v-for="(letter, i) in letterList" :key="i">{{ letter }}</span>
+      <span :class="activeIndex === -2 ? 'active' : ''" @click="selectLetter(-2, 'all')">All</span>
+      <Iconfont icon="icon-hot" class="icon-hot" :class="activeIndex === -1 ? 'active' : ''" @click.native="selectLetter(-1, 'hot')"></Iconfont>
+      <span 
+        v-for="(letter, i) in letterList" 
+        :key="i" 
+        :class="activeIndex === i ? 'active' : ''"
+        @click="selectLetter(i, letter)">{{ letter }}</span>
     </div>
-    <el-collapse @change="handleChange" class="collapse-wrapper">
+    <el-collapse class="collapse-wrapper">
+      <p class="words-none" v-if="wordsList.length === 0">暂无数据</p>
       <el-collapse-item
         v-for="word in wordsList"
         :key="word.id"
@@ -12,7 +18,9 @@
         class="collapse-item">
         <template slot="title">
           <h1 class="word-title">{{ word.word }}</h1>
-          <span class="word-mean">{{ word.mean }}</span>
+          <Iconfont icon="icon-speaker" fontSize="20" class="icon-speaker" @click.native.stop="speaker(word.word)"></Iconfont>
+          <span class="word-item word-pronounce">{{ word.pronounce }}</span>
+          <span class="word-item word-mean">{{ word.mean }}</span>
         </template>
         <div class="word-examples">
           <div v-for="(example, i) in word.examples" :key="example.id" class="examples-item">
@@ -25,12 +33,14 @@
         </div>
       </el-collapse-item>
     </el-collapse>
+    <audio ref="audio" autoplay="true" :src="pronounceSrc"></audio>
   </div>
 </template>
 
 <script>
 import Iconfont from '@/components/Iconfont'
 import API from '@/serviceAPI.config.js'
+import { mapGetters, mapMutations } from 'vuex'
 export default {
   name: 'WordsList',
   components: {
@@ -42,19 +52,49 @@ export default {
         'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 
       ],
       activeNames: [1],
-      wordsList: []
+      wordsList: [],
+      pronounceSrc: '',
+      activeIndex: -1
     }
   },
+  computed: {
+    ...mapGetters(['keyWord'])
+  },
   created() {
-    this.$http.get(API.wordsList, {
-      params: {letter: 'hot'}
-    }).then(res => {
-      this.wordsList = res.data.data
-    })
+    this.getWordsList({letter: 'hot'})
   },
   methods: {
-    handleChange() {
-
+    getWordsList(params) {
+      this.$http.get(API.wordsList, {
+        params
+      }).then(res => {
+        this.wordsList = res.data.data
+      })
+    },
+    speaker(word) {
+      var pronounceSrc = `http://dict.youdao.com/dictvoice?audio=${word}&type=1`
+      if (this.pronounceSrc === pronounceSrc) {
+        this.$refs.audio.play()
+      } else {
+        this.pronounceSrc = pronounceSrc
+      }
+    },
+    selectLetter(index, letter) {
+      this.activeIndex = index
+      this.setKeyWord('')
+      this.getWordsList({letter})
+    },
+    ...mapMutations({
+      setKeyWord: 'SET_KEYWORD'
+    })
+  },
+  watch: {
+    keyWord() {
+      if (this.keyWord === '') {
+        return
+      }
+      this.getWordsList({word: this.keyWord, search: true})
+      this.activeIndex = ''
     }
   }
 }
@@ -74,7 +114,7 @@ export default {
     margin-bottom: 20px;
     display: flex;
     justify-content: space-around;
-    .hot-icon {
+    .icon-hot {
       line-height: 25px;
       cursor: pointer;
       &:hover, &.active {
@@ -90,21 +130,8 @@ export default {
       &:hover {
         background: $color-shallowgray;
       }
-      .active {
+      &.active {
         color: $color-red;
-      }
-    }
-  }
-
-  .card-item {
-    width: 30%;
-    margin: 10px;
-    text-align: left;
-    font-size: 14px;
-    .word-title {
-      span {
-        font-weight: bold;
-        font-size: 20px;
       }
     }
   }
@@ -112,11 +139,24 @@ export default {
   .collapse-wrapper {
     width: 80%;
     text-align: left;
+    .words-none {
+      padding: 10px 0;
+    }
     .word-title {
       font-weight: bold;
       font-size: 20px;
       margin-right: 20px;
-      min-width: 200px;
+      // min-width: 200px;
+    }
+    .word-item {
+      margin: 0 10px;
+      &.word-pronounce {
+        color: $color-blue;
+        font-weight: bold;
+      }
+    }
+    .icon-speaker {
+      color: $color-blue;
     }
 
     .examples-item {

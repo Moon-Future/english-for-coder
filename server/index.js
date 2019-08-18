@@ -24,6 +24,6 @@ app.use(bodyParser())
 app.use(static(path.join(__dirname, '../dist'))); // 部署上线时读取静态文件
 app.use(router.routes()).use(router.allowedMethods())
 
-app.listen(3003, () => {
-  console.log('listen at port 3003...')
+app.listen(8887, () => {
+  console.log('listen at port 8887...')
 })

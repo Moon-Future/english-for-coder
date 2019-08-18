@@ -5,20 +5,32 @@
     </div>
     <div class="search-wrapper">
       <img alt="Vue logo" src="../assets/logo.png">
-      <el-input class="search-inp" v-model="input" placeholder="请输入单词查询">
-        <el-button slot="append" icon="el-icon-search"></el-button>
+      <el-input class="search-inp" :clearable="true" v-model="input" placeholder="请输入单词查询" @keyup.enter.native="search">
+        <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
       </el-input>
     </div>
   </div>
 </template>
 
 <script>
+import { mapGetters, mapMutations } from 'vuex'
 export default {
   name: 'Search',
   data() {
     return {
       input: ''
     }
+  },
+  computed: {
+    ...mapGetters(['keyWord'])
+  },
+  methods: {
+    search() {
+      this.setKeyWord(this.input)
+    },
+    ...mapMutations({
+      setKeyWord: 'SET_KEYWORD'
+    })
   }
 }
 </script>

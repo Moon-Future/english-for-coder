@@ -1,14 +1,22 @@
 <template>
   <div class="wordform-container">
-    <el-dialog title="新增" :visible.sync="visiable" :close-on-click-modal="false" @close="close">
+    <el-dialog :visible.sync="visiable" :close-on-click-modal="false" @close="close">
       <el-form close-on-click-modal="false" label-width="80px">
         <el-form-item 
           v-for="(field, i) in fields"
           :key="i"
           :label="field.label">
-          <el-input v-if="field.prop !== 'examples'" size="mini" v-model="form[field.prop]"></el-input>
+          <el-input 
+            v-if="field.prop !== 'examples'" 
+            size="mini" 
+            v-model="form[field.prop]"></el-input>
           <div v-else class="examples-wrapper">
-            <el-button v-show="examplesLength === 0" type="primary" size="mini" icon="el-icon-plus" circle @click="add(j)"></el-button>
+            <el-button 
+              v-show="examplesLength === 0" 
+              type="primary" size="mini" 
+              icon="el-icon-plus" 
+              circle 
+              @click="add(j)"></el-button>
             <template v-for="(example, j) in form.examples">
               <div v-if="example.operate !== '3'" class="examples-item" :key="j">
                 <el-input 
@@ -48,6 +56,10 @@ export default {
   name: 'wordForm',
   props: {
     visiable: {
+      type: Boolean,
+      default: false
+    },
+    admin: {
       type: Boolean,
       default: false
     },
@@ -119,6 +131,7 @@ export default {
         })
         this.form.examples = this.form.examples.concat(this.delExamples)
       }
+      this.form.admin = this.admin
       this.$http.post(API.editWord, this.form).then(res => {
         if (res.data.code === 200) {
           this.$message.success(res.data.message)
@@ -141,6 +154,7 @@ export default {
 @import '@/common/css/variable.scss';
 .wordform-container {
   width: 80%;
+  text-align: center;
 
   .examples-wrapper {
     text-align: left;
@@ -148,7 +162,7 @@ export default {
 
   .examples-item {
     padding: 10px;
-    border: 1px solid $color-blue;
+    border: 1px solid $color-shallowblue;
     margin-bottom: 10px;
   }
 }

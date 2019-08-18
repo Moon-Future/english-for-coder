@@ -1,0 +1,1 @@
+export const keyWord = state => state.keyWord

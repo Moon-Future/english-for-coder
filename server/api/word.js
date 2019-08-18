@@ -6,18 +6,32 @@ const shortid = require('shortid')
 router.get('/wordsList', async (ctx) => {
   try {
     const data = ctx.request.query
-    const letter = data.letter
+    const search = data.search
+    const word = data.word
+    const admin = data.admin
+    let letter = data.letter
     let sql, res, temp ={}, result = []
-    if (letter === 'hot') {
-      sql = `SELECT a.id, a.word, a.letter, a.mean, a.pronounce, e.id AS eid, e.en, e.zh FROM words AS a LEFT JOIN examples AS e ON a.id = e.wordID AND e.off != 1 WHERE a.counter >= 10 AND a.off != 1`
+    if (!search) {
+      if (letter === 'hot') {
+        sql = `SELECT a.id, a.word, a.letter, a.mean, a.pronounce, e.id AS eid, e.en, e.zh FROM words AS a 
+          LEFT JOIN examples AS e ON a.id = e.wordID AND e.off != 1 WHERE a.off != 1 AND ${admin ? 'true AND' : 'a.verify = 1 AND'} a.counter >= 10`
+      } else if (letter === 'all') {
+        sql = `SELECT a.id, a.word, a.letter, a.mean, a.pronounce, a.verify, e.id AS eid, e.en, e.zh FROM words AS a 
+          LEFT JOIN examples AS e ON a.id = e.wordID AND e.off != 1 WHERE a.off != 1 AND ${admin ? 'true' : 'a.verify = 1'}`
+      } else {
+        sql = `SELECT a.id, a.word, a.letter, a.mean, a.pronounce, e.id AS eid, e.en, e.zh FROM words AS a 
+          LEFT JOIN examples AS e ON a.id = e.wordID AND e.off != 1 WHERE a.off != 1 AND ${admin ? 'true AND' : 'a.verify = 1 AND'} a.letter = ?`
+      }
     } else {
-      sql = `SELECT a.id, a.word, a.letter, a.mean, a.pronounce, e.id AS eid, e.en, e.zh FROM words AS a LEFT JOIN examples AS e ON a.id = e.wordID AND e.off != 1 WHERE  a.letter = ? AND a.off != 1`
+      sql = `SELECT a.id, a.word, a.letter, a.mean, a.pronounce, e.id AS eid, e.en, e.zh FROM words AS a 
+        LEFT JOIN examples AS e ON a.id = e.wordID AND e.off != 1 WHERE a.off != 1 AND ${admin ? 'true AND' : 'a.verify = 1 AND'} a.word LIKE ?`
+      letter = `%${word.trim()}%`
     }
     res = await query(sql, [letter])
 
     res.forEach(item => {
       if (!temp[item.id]) {
-        temp[item.id] = {id: item.id, word: item.word, letter: item.letter, mean: item.mean, pronounce: item.pronounce, examples: [] }
+        temp[item.id] = {id: item.id, word: item.word, letter: item.letter, mean: item.mean, pronounce: item.pronounce, verify: item.verify, examples: [] }
         result.push(temp[item.id])
       }
       if (item.eid) {
@@ -38,6 +52,7 @@ router.post('/editWord', async (ctx) => {
     const mean = data.mean.trim()
     const pronounce = data.pronounce.trim()
     const examples = data.examples
+    const admin = data.admin
     const date = Date.now()
     let id = data.id
     let letter
@@ -55,8 +70,8 @@ router.post('/editWord', async (ctx) => {
       }
     } else {
       id = shortid.generate()
-      await query(`INSERT INTO words (id, word, letter, mean, pronounce, createTime) VALUES (?, ?, ?, ?, ?, ?)`, 
-        [id, word, letter, mean, pronounce, date])
+      await query(`INSERT INTO words (id, word, letter, mean, pronounce, createTime, verify) VALUES (?, ?, ?, ?, ?, ?, ?)`, 
+        [id, word, letter, mean, pronounce, date, admin ? 1 : 0])
     }
     for (let i = 0, len = examples.length; i < len; i++) {
       const example = examples[i]
@@ -76,6 +91,16 @@ router.post('/editWord', async (ctx) => {
           [shortid.generate(), id, en, zh, date])
       }
     }
+    ctx.body = {code: 200, message: admin ? '成功' : '谢谢🙏，提交成功，等待审核。'}
+  } catch(err) {
+    throw new Error(err)
+  }
+})
+
+router.post('/changeVerify', async (ctx) => {
+  try {
+    const data = ctx.request.body
+    await query(`UPDATE words SET verify = ? WHERE id = ?`, [data.verify, data.id])
     ctx.body = {code: 200, message: '成功'}
   } catch(err) {
     throw new Error(err)

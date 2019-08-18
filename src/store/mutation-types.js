@@ -1,0 +1,1 @@
+export const SET_KEY_WORD = 'SET_KEYWORD'

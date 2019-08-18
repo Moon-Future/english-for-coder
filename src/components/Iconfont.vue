@@ -15,7 +15,7 @@ export default {
   props: {
     icon: {
       type: String,
-      default: 'icon-hot'
+      default: ''
     },
     fontSize: {
       type: String,
