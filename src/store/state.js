@@ -1,5 +1,7 @@
 const state = {
-  keyWord: ''
+  keyWord: '',
+  loginStatus: false,
+  userInfo: {}
 }
 
 export default state

@@ -1,1 +1,5 @@
-export const SET_KEY_WORD = 'SET_KEYWORD'
+export const SET_KEYWORD = 'SET_KEYWORD'
+
+export const SET_LOGINSTATUS = 'SET_LOGINSTATUS'
+
+export const SET_USERINFO = 'SET_USERINFO'

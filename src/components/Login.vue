@@ -50,7 +50,9 @@
 </template>
 
 <script>
+const crypto = require('crypto')
 import API from '@/serviceAPI.config.js'
+import { mapMutations } from 'vuex'
 export default {
   name: 'Login',
   props: {
@@ -90,7 +92,7 @@ export default {
           {required: true, validator: (rule, value, callback) => {
             if (value === '') {
               callback(new Error('请输入密码'))
-            } else if (!pattern.test(value.trim())) {
+            } else if (!this.loginFlag && !pattern.test(value.trim())) {
               callback(new Error('6 ~ 16位，可包含字母 数字 _ - .'))
             } else {
               callback()
@@ -115,6 +117,9 @@ export default {
     }
   },
   methods: {
+    ...mapMutations({
+      setUserInfo: 'SET_USERINFO'
+    }),
     close() {
       this.$emit('loginForm', false)
     },
@@ -123,15 +128,44 @@ export default {
       this.$refs.loginForm.resetFields()
     },
     submit() {
-      console.log(this.form)
+      const { account, password } = this.form
       this.$refs.loginForm.validate((valid) => {
         if (!valid) {
           return false
         }
-        console.log(API.register)
-        this.$http.post(API.register, this.form).then(res => {
-
-        })
+        if (this.loginFlag) { // 登陆
+          this.$http.post(API.login, {
+            account: this.form.account,
+            password: crypto.createHash('sha1').update(this.form.password.trim()).digest('hex')
+          }).then(res => {
+            if (res.data.code === 1) {
+              this.$message.success(res.data.message)
+              const token = res.data.data.token
+              const userInfo = res.data.data.userInfo
+              localStorage.setItem('token', token)
+              this.setUserInfo({userInfo, status: true})
+            } else {
+              this.$message.error(res.data.message)
+            }
+          })
+        } else { // 注册
+          this.$http.post(API.register, {
+            account: this.form.account,
+            password: crypto.createHash('sha1').update(this.form.password.trim()).digest('hex'),
+            rePassword: crypto.createHash('sha1').update(this.form.rePassword.trim()).digest('hex'),
+            name: this.form.name,
+            website: this.form.website
+          }).then(res => {
+            if (res.data.code === 1) {
+              this.$message.success(res.data.message)
+              this.changeFlag(true)
+              this.form.account = account
+              this.form.password = password
+            } else {
+              this.$message.error(res.data.message)
+            }
+          })
+        }
       })
     }
   }
