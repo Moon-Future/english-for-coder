@@ -142,6 +142,7 @@ export default {
     text-align: left;
     .words-none {
       padding: 10px 0;
+      text-align: center;
     }
     .word-title {
       font-weight: bold;

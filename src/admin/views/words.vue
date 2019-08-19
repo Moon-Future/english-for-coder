@@ -117,7 +117,7 @@ export default {
       }).then(() => {
         data.operate = '3'
         this.$http.post(API.editWord, data).then(res => {
-          if (res.data.code === 200) {
+          if (res.data.code === 1) {
             this.wordsList.splice(index, 1)
             this.$message.success(res.data.message)
           } else {
@@ -138,7 +138,7 @@ export default {
         this.$http.post(API.changeVerify, {
           id: data.id, verify: verify
         }).then(res => {
-          if (res.data.code === 200) {
+          if (res.data.code === 1) {
             this.$message.success(res.data.message)
             data.verify = verify
           } else {

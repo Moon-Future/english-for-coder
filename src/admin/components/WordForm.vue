@@ -133,7 +133,7 @@ export default {
       }
       this.form.admin = this.admin
       this.$http.post(API.editWord, this.form).then(res => {
-        if (res.data.code === 200) {
+        if (res.data.code === 1) {
           this.$message.success(res.data.message)
           this.$emit('wordForm', false, true)
         } else {

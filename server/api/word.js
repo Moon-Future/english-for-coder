@@ -6,9 +6,7 @@ const shortid = require('shortid')
 router.get('/wordsList', async (ctx) => {
   try {
     const data = ctx.request.query
-    const search = data.search
-    const word = data.word
-    const admin = data.admin
+    const { search, word, admin } = data
     let letter = data.letter
     let sql, res, temp ={}, result = []
     if (!search) {
@@ -39,7 +37,7 @@ router.get('/wordsList', async (ctx) => {
       }
     })
 
-    ctx.body = {code: 200, data: result}
+    ctx.body = {code: 1, data: result}
   } catch(err) {
     throw new Error(err)
   }
@@ -57,7 +55,7 @@ router.post('/editWord', async (ctx) => {
     let id = data.id
     let letter
     if (word === '') {
-      ctx.body = {code: 500, message: '"单词"项不得为空'}
+      ctx.body = {code: 0, message: '"单词"项不得为空'}
       return
     }
     letter = word[0].toLocaleUpperCase()
@@ -91,7 +89,7 @@ router.post('/editWord', async (ctx) => {
           [shortid.generate(), id, en, zh, date])
       }
     }
-    ctx.body = {code: 200, message: admin ? '成功' : '谢谢🙏，提交成功，等待审核。'}
+    ctx.body = {code: 1, message: admin ? '成功' : '谢谢🙏，提交成功，等待审核。'}
   } catch(err) {
     throw new Error(err)
   }
@@ -101,7 +99,7 @@ router.post('/changeVerify', async (ctx) => {
   try {
     const data = ctx.request.body
     await query(`UPDATE words SET verify = ? WHERE id = ?`, [data.verify, data.id])
-    ctx.body = {code: 200, message: '成功'}
+    ctx.body = {code: 1, message: '成功'}
   } catch(err) {
     throw new Error(err)
   }
