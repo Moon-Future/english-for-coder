@@ -21,6 +21,14 @@
           <Iconfont icon="icon-speaker" fontSize="20" class="icon-speaker" @click.native.stop="speaker(word.word)"></Iconfont>
           <span class="word-item word-pronounce">{{ word.pronounce }}</span>
           <span class="word-item word-mean">{{ word.mean }}</span>
+          <el-popover
+            placement="left"
+            trigger="click"
+            class="word-contributor">
+            <p class="user-more" v-for="website in word.websiteList" :key="website.id"><a :href="'//' + website.url" target="_blank">{{ website.name }}</a></p>
+            <p class="user-more" v-if="!word.websiteList || word.websiteList.length === 0">空空如也</p>
+            <span slot="reference" @click.stop="getUserMore(word)">{{ word.name }}</span>
+          </el-popover>
         </template>
         <div class="word-examples">
           <div v-for="(example, i) in word.examples" :key="example.id" class="examples-item">
@@ -54,7 +62,8 @@ export default {
       activeNames: [1],
       wordsList: [],
       pronounceSrc: '',
-      activeIndex: -1
+      activeIndex: -1,
+      websiteMap: {}
     }
   },
   computed: {
@@ -83,6 +92,19 @@ export default {
       this.activeIndex = index
       this.setKeyWord('')
       this.getWordsList({letter})
+    },
+    getUserMore(word) {
+      const { userID, wordID } = word
+      if (this.websiteMap[userID]) {
+        Vue.set(word, 'websiteList', this.websiteMap[userID])
+      } else {
+        this.$http.get(API.getUserMore, {
+          params: {userID}
+        }).then(res => {
+          Vue.set(word, 'websiteList', res.data.data)
+          this.websiteMap[userID] = res.data.data
+        })
+      }
     },
     ...mapMutations({
       setKeyWord: 'SET_KEYWORD'
@@ -144,11 +166,23 @@ export default {
       padding: 10px 0;
       text-align: center;
     }
+    .collapse-item {
+      position: relative;
+    }
+    .word-contributor {
+      position: absolute;
+      right: 30px;
+      display: flex;
+      span {
+        color: $color-blue;
+        font-weight: bold;
+      }
+    }
     .word-title {
       font-weight: bold;
       font-size: 20px;
       margin-right: 20px;
-      // min-width: 200px;
+      min-width: 200px;
     }
     .word-item {
       margin: 0 10px;
@@ -169,6 +203,14 @@ export default {
         color: $color-gray;
       }
     }
+  }
+}
+.user-more {
+  text-align: center;
+  padding: 5px 0;
+  a {
+    text-decoration: underline;
+    color: $color-gray;
   }
 }
 </style>

@@ -67,15 +67,49 @@ router.post('/login', async (ctx) => {
       ctx.body = {code: 0, message: '用户名或密码有误'}
       return
     }
+    await query(`UPDATE user SET lastTime = ? WHERE id = ?`, [Date.now(), result[0].id])
     const websiteRst = await query(`SELECT * FROM user_website WHERE userID = ?`, [result[0].id])
     const userInfo = {
       id: result[0].id,
       name: result[0].name,
       avatar: result[0].avatar,
-      website: websiteRst
+      website: websiteRst,
     }
-    const token = jwt.sign(userInfo, tokenConfig.privateKey, {expiresIn: '1d'})
-    ctx.body = {code: 1, message: '登陆成功', data: {token, userInfo}}
+    if (result[0].root == 1) {
+      userInfo.root = true
+    }
+    const token = jwt.sign(userInfo, tokenConfig.privateKey, {expiresIn: '7d'})
+    ctx.body = {code: 1, message: '登陆成功', data: {token: 'Bearer ' + token, userInfo}}
+  } catch(err) {
+    throw new Error(err)
+  }
+})
+
+router.get('/getUserMore', async (ctx) => {
+  try {
+    const data = ctx.request.query
+    const { userID } = data
+    const result = await query(`SELECT * FROM user_website WHERE userID = ?`, [userID])
+    ctx.body = {code: 1, data: result}
+  } catch(err) {
+    throw new Error(err)
+  }
+})
+
+router.get('/getUserInfo', async (ctx) => {
+  try {
+    const token = ctx.get('Authorization')
+    let userInfo = {}
+    if (token === '') {
+      ctx.body = {userInfo, loginStatus: false}
+    } else {
+      try {
+        userInfo = jwt.verify(token.split(' ')[1], tokenConfig.privateKey)
+        ctx.body = {userInfo, loginStatus: true}
+      } catch(err) {
+        ctx.body = {userInfo, loginStatus: false}
+      }
+    }
   } catch(err) {
     throw new Error(err)
   }

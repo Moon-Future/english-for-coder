@@ -6,9 +6,25 @@
           <Iconfont icon="icon-contribute"></Iconfont>
           <span>贡献</span>
         </li>
-        <li>
+        <li v-if="!loginStatus">
           <span class="menu-item-login" @click="login">登陆</span>
           <span @click="register">注册</span>
+        </li>
+        <li v-else class="user-wrapper">
+          <el-dropdown trigger="click">
+            <div class="avatar">
+              <span>{{ userInfo.name }}</span>
+              <img :src="avatar" alt="">
+            </div>
+            <el-dropdown-menu slot="dropdown" class="user-menu">
+              <el-dropdown-item @click.native="edit">
+                <Iconfont icon="icon-edit"></Iconfont>编辑
+              </el-dropdown-item>
+              <el-dropdown-item @click.native="logout">
+                <Iconfont icon="icon-logout"></Iconfont>登出
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
         </li>
       </ul>
     </div>
@@ -21,6 +37,7 @@
 import Iconfont from '@/components/Iconfont'
 import WordForm from '@/admin/components/WordForm'
 import Login from '@/components/Login'
+import { mapGetters, mapMutations } from 'vuex'
 export default {
   name: 'Header',
   components: {
@@ -38,8 +55,12 @@ export default {
         mean: '',
         pronounce: '',
         examples: []
-      }
+      },
+      avatar: require('../assets/avatar.jpg')
     }
+  },
+  computed: {
+    ...mapGetters(['loginStatus', 'userInfo'])
   },
   methods: {
     wordForm(flag) {
@@ -62,12 +83,23 @@ export default {
       this.loginVisiable = true
       this.loginFlag = false
     },
+    edit() {
+      this.loginVisiable = true
+      this.loginFlag = false
+    },
     loginForm(flag) {
       this.loginVisiable = flag
     },
     changeFlag(flag) {
       this.loginFlag = flag
-    }
+    },
+    logout() {
+      localStorage.removeItem('token')
+      this.setUserInfo({userInfo: {}, status: false})
+    },
+    ...mapMutations({
+      setUserInfo: 'SET_USERINFO'
+    })
   }
 }
 </script>
@@ -98,7 +130,22 @@ export default {
       .menu-item-login::after {
         content: ' · '
       }
+      &.user-wrapper .avatar {
+        cursor: pointer;
+        display: flex;
+        img {
+          width: 50px;
+          height: 50px;
+          border-radius: 50%;
+        }
+      }
     }
+  }
+}
+
+.user-menu {
+  li {
+    color: $color-gray;
   }
 }
 </style>

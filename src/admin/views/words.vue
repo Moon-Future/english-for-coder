@@ -60,6 +60,7 @@ export default {
         {prop: 'mean', label: '词意'},
         {prop: 'pronounce', label: '发音'},
         {prop: 'counter', label: '热度'},
+        {prop: 'name', label: '贡献者'},
         {prop: 'verify', label: '状态'}
       ],
       formVisiable: false,

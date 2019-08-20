@@ -11,25 +11,35 @@ router.get('/wordsList', async (ctx) => {
     let sql, res, temp ={}, result = []
     if (!search) {
       if (letter === 'hot') {
-        sql = `SELECT a.id, a.word, a.letter, a.mean, a.pronounce, e.id AS eid, e.en, e.zh FROM words AS a 
-          LEFT JOIN examples AS e ON a.id = e.wordID AND e.off != 1 WHERE a.off != 1 AND ${admin ? 'true AND' : 'a.verify = 1 AND'} a.counter >= 10`
+        sql = `SELECT a.id, a.word, a.letter, a.mean, a.pronounce, e.id AS eid, e.en, e.zh, u.id AS userID, u.name, u.avatar FROM words AS a 
+          LEFT JOIN examples AS e ON a.id = e.wordID AND e.off != 1 
+          LEFT JOIN user AS u ON a.userID = u.id
+          WHERE a.off != 1 AND ${admin ? 'true AND' : 'a.verify = 1 AND'} a.counter >= 10`
       } else if (letter === 'all') {
-        sql = `SELECT a.id, a.word, a.letter, a.mean, a.pronounce, a.verify, e.id AS eid, e.en, e.zh FROM words AS a 
-          LEFT JOIN examples AS e ON a.id = e.wordID AND e.off != 1 WHERE a.off != 1 AND ${admin ? 'true' : 'a.verify = 1'}`
+        sql = `SELECT a.id, a.word, a.letter, a.mean, a.pronounce, a.verify, e.id AS eid, e.en, e.zh, u.id AS userID, u.name, u.avatar FROM words AS a 
+          LEFT JOIN examples AS e ON a.id = e.wordID AND e.off != 1 
+          LEFT JOIN user AS u ON a.userID = u.id
+          WHERE a.off != 1 AND ${admin ? 'true' : 'a.verify = 1'}`
       } else {
-        sql = `SELECT a.id, a.word, a.letter, a.mean, a.pronounce, e.id AS eid, e.en, e.zh FROM words AS a 
-          LEFT JOIN examples AS e ON a.id = e.wordID AND e.off != 1 WHERE a.off != 1 AND ${admin ? 'true AND' : 'a.verify = 1 AND'} a.letter = ?`
+        sql = `SELECT a.id, a.word, a.letter, a.mean, a.pronounce, e.id AS eid, e.en, e.zh, u.id AS userID, u.name, u.avatar FROM words AS a 
+          LEFT JOIN examples AS e ON a.id = e.wordID AND e.off != 1 
+          LEFT JOIN user AS u ON a.userID = u.id 
+          WHERE a.off != 1 AND ${admin ? 'true AND' : 'a.verify = 1 AND'} a.letter = ?`
       }
     } else {
-      sql = `SELECT a.id, a.word, a.letter, a.mean, a.pronounce, e.id AS eid, e.en, e.zh FROM words AS a 
-        LEFT JOIN examples AS e ON a.id = e.wordID AND e.off != 1 WHERE a.off != 1 AND ${admin ? 'true AND' : 'a.verify = 1 AND'} a.word LIKE ?`
+      sql = `SELECT a.id, a.word, a.letter, a.mean, a.pronounce, e.id AS eid, e.en, e.zh, u.id AS userID, u.name, u.avatar FROM words AS a 
+        LEFT JOIN examples AS e ON a.id = e.wordID AND e.off != 1 
+        LEFT JOIN user AS u ON a.userID = u.id 
+        WHERE a.off != 1 AND ${admin ? 'true AND' : 'a.verify = 1 AND'} a.word LIKE ?`
       letter = `%${word.trim()}%`
     }
     res = await query(sql, [letter])
 
     res.forEach(item => {
       if (!temp[item.id]) {
-        temp[item.id] = {id: item.id, word: item.word, letter: item.letter, mean: item.mean, pronounce: item.pronounce, verify: item.verify, examples: [] }
+        temp[item.id] = {
+          id: item.id, word: item.word, letter: item.letter, mean: item.mean, pronounce: item.pronounce,
+          verify: item.verify, userID: item.userID, name: item.name, avatar: item.avatar, examples: []}
         result.push(temp[item.id])
       }
       if (item.eid) {
@@ -68,8 +78,8 @@ router.post('/editWord', async (ctx) => {
       }
     } else {
       id = shortid.generate()
-      await query(`INSERT INTO words (id, word, letter, mean, pronounce, createTime, verify) VALUES (?, ?, ?, ?, ?, ?, ?)`, 
-        [id, word, letter, mean, pronounce, date, admin ? 1 : 0])
+      await query(`INSERT INTO words (id, word, letter, mean, pronounce, userID, createTime, verify) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, 
+        [id, word, letter, mean, pronounce, data.userID, date, admin ? 1 : 0])
     }
     for (let i = 0, len = examples.length; i < len; i++) {
       const example = examples[i]

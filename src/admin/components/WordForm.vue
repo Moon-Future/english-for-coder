@@ -52,6 +52,8 @@
 
 <script>
 import API from '@/serviceAPI.config.js'
+import { mapGetters } from 'vuex'
+import { userInfo } from 'os';
 export default {
   name: 'wordForm',
   props: {
@@ -91,7 +93,8 @@ export default {
         len += item.operate === '3' ? 0 : 1
       })
       return len
-    }
+    },
+    ...mapGetters(['userInfo'])
   },
   methods: {
     add(index) {
@@ -131,6 +134,7 @@ export default {
         })
         this.form.examples = this.form.examples.concat(this.delExamples)
       }
+      this.form.userID = this.userInfo.id || ''
       this.form.admin = this.admin
       this.$http.post(API.editWord, this.form).then(res => {
         if (res.data.code === 1) {

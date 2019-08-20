@@ -3,5 +3,7 @@ module.exports = {
   editWord: '/api/word/editWord',
   changeVerify: '/api/word/changeVerify',
   register: '/api/user/register',
-  login: '/api/user/login'
+  login: '/api/user/login',
+  getUserInfo: '/api/user/getUserInfo',
+  getUserMore: '/api/user/getUserMore'
 }

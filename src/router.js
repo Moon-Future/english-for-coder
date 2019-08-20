@@ -15,11 +15,19 @@ export default new VueRouter({
     {
       path: '/admin',
       name: 'admin',
+      meta: {
+        requireAuth: true,
+        root: true
+      },
       component: () => import('./admin/views/Home'),
       children: [
         {
           path: '/admin/words',
           name: 'words',
+          meta: {
+            requireAuth: true,
+            root: true
+          },
           component: () => import('./admin/views/Words'),
         }
       ]

@@ -144,6 +144,7 @@ export default {
               const userInfo = res.data.data.userInfo
               localStorage.setItem('token', token)
               this.setUserInfo({userInfo, status: true})
+              this.$emit('loginForm', false)
             } else {
               this.$message.error(res.data.message)
             }
