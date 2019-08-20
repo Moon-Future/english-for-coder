@@ -25,7 +25,7 @@
             placement="left"
             trigger="click"
             class="word-contributor">
-            <p class="user-more" v-for="website in word.websiteList" :key="website.id"><a :href="'//' + website.url" target="_blank">{{ website.name }}</a></p>
+            <p class="user-more" v-for="website in word.websiteList" :key="website.id"><a :href="(/https:|http:/.test(website.url) ? '' : '//') + website.url" target="_blank">{{ website.name }}</a></p>
             <p class="user-more" v-if="!word.websiteList || word.websiteList.length === 0">空空如也</p>
             <span slot="reference" @click.stop="getUserMore(word)">{{ word.name }}</span>
           </el-popover>

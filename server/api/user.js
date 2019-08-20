@@ -3,7 +3,8 @@ const router = new Router()
 const query = require('../database/init')
 const shortid = require('shortid')
 const jwt = require('jsonwebtoken')
-const { tokenConfig } = require('../secret')
+const axios = require('axios')
+const { tokenConfig, githubConfig } = require('../secret')
 const { transporter, mailOptions, sendMsg } = require('./email')
 
 router.post('/register', async (ctx) => {
@@ -34,8 +35,8 @@ router.post('/register', async (ctx) => {
       }
     }
     let userID = shortid.generate()
-    await query(`INSERT INTO user (id, account, password, name, avatar, createTime) 
-      VALUES (?, ?, ?, ?, ?, ?)`, [userID, account.trim(), password, name.trim(), '', date])
+    await query(`INSERT INTO user (id, account, password, name, avatar, email, createTime) 
+      VALUES (?, ?, ?, ?, ?, ?, ?)`, [userID, account.trim(), password, name.trim(), '', account, date])
     for (let i = 0, len = websiteList.length; i < len; i++) {
       let item = websiteList[i]
       await query(`INSERT INTO user_website (id, userID, name, url, createTime) 
@@ -67,6 +68,7 @@ router.post('/login', async (ctx) => {
       ctx.body = {code: 0, message: '用户名或密码有误'}
       return
     }
+    // 登陆时间
     await query(`UPDATE user SET lastTime = ? WHERE id = ?`, [Date.now(), result[0].id])
     const websiteRst = await query(`SELECT * FROM user_website WHERE userID = ?`, [result[0].id])
     const userInfo = {
@@ -110,6 +112,58 @@ router.get('/getUserInfo', async (ctx) => {
         ctx.body = {userInfo, loginStatus: false}
       }
     }
+  } catch(err) {
+    throw new Error(err)
+  }
+})
+
+// Github授权登陆
+router.get('/githubCallback', async (ctx) => {
+  try {
+    const host = ctx.get('host')
+    const NODE_ENV = host.includes('localhost') ? 'dev' : 'pro' // dev, pro
+    const params = ctx.request.query
+    const tokenResponse = await axios.post(githubConfig.accessURL, {
+      client_id: githubConfig[NODE_ENV].client_id,
+      client_secret: githubConfig[NODE_ENV].client_secret,
+      code: params.code
+    })
+    const userResponse = await axios.get(`${githubConfig.tokenURL}${tokenResponse.data}`)
+    const userData = userResponse.data
+    const userID = userData.id + 'Github'
+    const date = Date.now()
+    let userInfo = {
+      id: userID,
+      name: userData.name,
+      avatar: userData.avatar_url,
+      email: userData.email
+    }
+    let websiteList = [{name: 'Github', url: userData.html_url}]
+    if (userData.blog) {
+      websiteList.push({name: 'Blog', url: userData.blog})
+    }
+    userInfo.website = websiteList
+
+    // 注册
+    const result = await query(`SELECT * FROM user WHERE id = ?`, [userID])
+    if (result.length === 0) {
+      await query(`INSERT INTO user (id, name, avatar, email, createTime) 
+        VALUES (?, ?, ?, ?, ?)`, [userID, userInfo.name, userInfo.avatar, userInfo.email, date])
+      for (let i = 0, len = websiteList.length; i < len; i++) {
+        let item = websiteList[i]
+        await query(`INSERT INTO user_website (id, userID, name, url, createTime) 
+          VALUES (?, ?, ?, ?, ?)`, [shortid.generate(), userID, item.name, item.url, date])
+      }
+    } else {
+      if (result[0].root == 1) {
+        userInfo.root = true
+      }
+    }
+    // 登陆时间
+    await query(`UPDATE user SET lastTime = ? WHERE id = ?`, [Date.now(), userID])
+    const token = jwt.sign(userInfo, tokenConfig.privateKey, {expiresIn: '7d'})
+
+    ctx.response.redirect(githubConfig[NODE_ENV].redirect + '?token=Bearer ' + token);
   } catch(err) {
     throw new Error(err)
   }

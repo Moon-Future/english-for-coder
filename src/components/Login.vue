@@ -42,7 +42,7 @@
         <p>第三方账号登陆：</p>
         <div class="other-list">
           <img src="https://b-gold-cdn.xitu.io/v3/static/img/wechat.e0ff124.svg" alt="">
-          <img src="https://b-gold-cdn.xitu.io/v3/static/img/github.547dd8a.svg" alt="">
+          <img src="https://b-gold-cdn.xitu.io/v3/static/img/github.547dd8a.svg" alt="" @click="otherLogin('github')">
         </div>
       </div>
     </el-dialog>
@@ -127,6 +127,13 @@ export default {
       this.$emit('changeFlag', flag)
       this.$refs.loginForm.resetFields()
     },
+    otherLogin(name) {
+      const client_id = window.location.host.includes('localhost') ? 'd5f5205584c80bdb5f16' : '5b329c08da31f808bd35'
+      if (name === 'github') {
+        var href = `https://github.com/login/oauth/authorize?client_id=${client_id}&scope=user:email`
+        window.location.href = href
+      }
+    },
     submit() {
       const { account, password } = this.form
       this.$refs.loginForm.validate((valid) => {
@@ -142,6 +149,7 @@ export default {
               this.$message.success(res.data.message)
               const token = res.data.data.token
               const userInfo = res.data.data.userInfo
+              // 存入token
               localStorage.setItem('token', token)
               this.setUserInfo({userInfo, status: true})
               this.$emit('loginForm', false)

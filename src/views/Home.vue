@@ -16,6 +16,15 @@ export default {
     Header,
     Search,
     WordsList
+  },
+  created() {
+    const token = this.$route.query.token
+    if (token) {
+      localStorage.setItem('token', token)
+      this.$router.push({
+        path: '/',
+      })
+    }
   }
 }
 </script>

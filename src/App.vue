@@ -4,28 +4,6 @@
   </div>
 </template>
 
-<script>
-import API from '@/serviceAPI.config.js'
-import { mapMutations } from 'vuex'
-export default {
-  created() {
-    // let token = localStorage.getItem('token')
-    // if (!token) {
-    //   this.setUserInfo({userInfo: {}, status: false})
-    // }
-    // axios.post(API.getUserInfo, {token}).then(res => {
-    //   this.setUserInfo({userInfo: res.data.userInfo, status: res.data.loginStatus})
-    // })
-  },
-  methods: {
-    ...mapMutations({
-      setUserInfo: 'SET_USERINFO'
-    })
-  }
-}
-</script>
-
-
 <style lang="scss">
 @import '@/common/css/reset.scss';
 #app {
