@@ -35,9 +35,11 @@
       <div class="form-message" v-show="loginFlag">
         <span>没有账号？</span>
         <span class="span-link" @click="changeFlag(false)">注册</span>
-        <span class="span-link right">忘记密码</span>
+        <!-- <span class="span-link right">忘记密码</span> -->
       </div>
-      <p class="has-account" v-show="!loginFlag" @click="changeFlag(true)">已有账号登陆</p>
+      <p class="has-account" v-show="!loginFlag">
+        <span @click="changeFlag(true)">已有账号登陆</span>
+      </p>
       <div class="other-login">
         <p>第三方账号登陆：</p>
         <div class="other-list">
@@ -204,9 +206,11 @@ export default {
 }
 .has-account {
   color: $color-blue;
-  cursor: pointer;
   text-align: center;
   margin: 15px;
+  span {
+    cursor: pointer;
+  }
 }
 
 .other-login {

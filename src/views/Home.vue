@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <Header></Header>
+    <Header :formStatus="true"></Header>
     <Search></Search>
     <words-list></words-list>
   </div>

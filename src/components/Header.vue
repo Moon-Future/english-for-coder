@@ -18,7 +18,7 @@
             </div>
             <el-dropdown-menu slot="dropdown" class="user-menu">
               <el-dropdown-item @click.native="edit">
-                <Iconfont icon="icon-edit"></Iconfont>编辑
+                <Iconfont icon="icon-edit"></Iconfont>设置
               </el-dropdown-item>
               <el-dropdown-item @click.native="logout">
                 <Iconfont icon="icon-logout"></Iconfont>登出
@@ -28,8 +28,10 @@
         </li>
       </ul>
     </div>
-    <Login :visiable="loginVisiable" :loginFlag="loginFlag" @loginForm="loginForm" @changeFlag="changeFlag"></Login>
-    <word-form :visiable="formVisiable" :admin="false" :form="form" @wordForm="wordForm"></word-form>
+    <div v-if="formStatus">
+      <Login :visiable="loginVisiable" :loginFlag="loginFlag" @loginForm="loginForm" @changeFlag="changeFlag"></Login>
+      <word-form :visiable="formVisiable" :admin="false" :form="form" @wordForm="wordForm"></word-form>
+    </div>
   </div>
 </template>
 
@@ -40,6 +42,12 @@ import Login from '@/components/Login'
 import { mapGetters, mapMutations } from 'vuex'
 export default {
   name: 'Header',
+  props: {
+    formStatus: {
+      type: Boolean,
+      default: false
+    }
+  },
   components: {
     Iconfont,
     WordForm,
