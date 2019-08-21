@@ -9,7 +9,7 @@
         :class="activeIndex === i ? 'active' : ''"
         @click="selectLetter(i, letter)">{{ letter }}</span>
     </div>
-    <el-collapse class="collapse-wrapper" accordion="true" @change="open">
+    <el-collapse class="collapse-wrapper" @change="open">
       <p class="words-none" v-if="wordsList.length === 0">暂无数据</p>
       <el-collapse-item
         v-for="word in wordsList"

@@ -24,7 +24,7 @@ export default {
     width: 200px;
     text-align: left;
     position: fixed;
-    top: 0;
+    top: 50px;
     bottom: 0;
     background: #545c64;
 

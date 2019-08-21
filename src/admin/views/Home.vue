@@ -1,5 +1,6 @@
 <template>
   <div class="admin-container">
+    <Header :formStatus="false"></Header>
     <nav-menu></nav-menu>
     <div class="admin-content">
       <router-view></router-view>
@@ -9,10 +10,12 @@
 
 <script>
 import NavMenu from '@/admin/components/NavMenu'
+import Header from '@/components/Header'
 export default {
   name: 'home',
   components: {
-    NavMenu
+    NavMenu,
+    Header
   }
 }
 </script>
@@ -22,7 +25,7 @@ export default {
   position: absolute;
   left: 200px;
   right: 0;
-  top: 0;
+  top: 50px;
   bottom: 0;
   padding: 20px;
 }

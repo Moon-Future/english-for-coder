@@ -13,6 +13,32 @@ export default new VueRouter({
       component: Home
     },
     {
+      path: '/user',
+      name: 'user',
+      meta: {
+        requireAuth: true
+      },
+      component: () => import('./views/User'),
+      children: [
+        {
+          path: '/user/words',
+          name: 'userWords',
+          meta: {
+            requireAuth: true
+          },
+          component: () => import('./views/Words'),
+        },
+        {
+          path: '/user/profile',
+          name: 'userProfile',
+          meta: {
+            requireAuth: true
+          },
+          component: () => import('./views/Profile'),
+        }
+      ]
+    },
+    {
       path: '/admin',
       name: 'admin',
       meta: {

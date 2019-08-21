@@ -1,8 +1,9 @@
 <template>
   <div class="header-container">
     <div class="hedaer-menu">
+      <router-link class="header-logo" to="/">English 4 Coder</router-link>
       <ul class="menu-wrapper">
-        <li @click="add">
+        <li @click="add" v-if="formStatus">
           <Iconfont icon="icon-contribute"></Iconfont>
           <span>贡献</span>
         </li>
@@ -17,12 +18,14 @@
               <img :src="userInfo.avatar || avatar" alt="">
             </div>
             <el-dropdown-menu slot="dropdown" class="user-menu">
-              <el-dropdown-item v-if="userInfo.root">
-                <Iconfont icon="icon-guanliyuan"></Iconfont><router-link to="/admin/words">后台管理</router-link>
-              </el-dropdown-item>
-              <el-dropdown-item>
-                <Iconfont icon="icon-edit"></Iconfont>设置
-              </el-dropdown-item>
+              <template v-for="(item, i) in dropdownList">
+                <el-dropdown-item
+                  v-if="item.root && userInfo.root || !item.root"
+                  :key="i"
+                  @click.native="goPage(item.path)">
+                  <Iconfont :icon="item.icon"></Iconfont>{{ item.name }}
+                </el-dropdown-item>
+              </template>
               <el-dropdown-item @click.native="logout">
                 <Iconfont icon="icon-logout"></Iconfont>登出
               </el-dropdown-item>
@@ -67,6 +70,10 @@ export default {
         pronounce: '',
         examples: []
       },
+      dropdownList: [
+        {icon: 'icon-setting', path: '/admin/words', name: '后台管理', root: true},
+        {icon: 'icon-user', path: '/user/words', name: '我的主页'}
+      ],
       avatar: require('../assets/avatar.jpg')
     }
   },
@@ -97,6 +104,10 @@ export default {
     logout() {
       localStorage.removeItem('token')
       this.setUserInfo({userInfo: {}, status: false})
+      this.$router.push({path: '/'})
+    },
+    goPage(path) {
+      this.$router.push({path})
     },
     ...mapMutations({
       setUserInfo: 'SET_USERINFO',
@@ -113,10 +124,14 @@ export default {
   border-bottom: 1px solid $color-shallowgray;
   
   .hedaer-menu {
+    display: flex;
+    justify-content: space-between;
     height: 50px;
     line-height: 50px;
-    text-align: right;
     padding: 0 10px;
+    .header-logo {
+      cursor: pointer;
+    }
   }
 
   .menu-wrapper {
