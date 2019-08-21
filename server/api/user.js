@@ -89,8 +89,8 @@ router.post('/login', async (ctx) => {
 
 router.get('/getUserMore', async (ctx) => {
   try {
-    const data = ctx.request.query
-    const { userID } = data
+    const params = ctx.request.query
+    const { userID } = params
     const result = await query(`SELECT * FROM user_website WHERE userID = ?`, [userID])
     ctx.body = {code: 1, data: result}
   } catch(err) {

@@ -3,7 +3,7 @@
     <el-dialog 
       :title="loginFlag ? '登陆' : '注册'"
       width="26rem"
-      :visible.sync="visiable" 
+      :visible.sync="loginVisiable" 
       :close-on-click-modal="false" 
       @close="close">
       <el-form ref="loginForm" :model="form" :rules="rules">
@@ -54,19 +54,9 @@
 <script>
 const crypto = require('crypto')
 import API from '@/serviceAPI.config.js'
-import { mapMutations } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
 export default {
   name: 'Login',
-  props: {
-    visiable: {
-      type: Boolean,
-      default: false
-    },
-    loginFlag: { // 是否登陆界面
-      type: Boolean,
-      default: false
-    }
-  },
   data() {
     const pattern = /^[\w._-]{6,16}$/
     return {
@@ -118,15 +108,20 @@ export default {
       }
     }
   },
+  computed: {
+    ...mapGetters(['loginVisiable', 'loginFlag'])
+  },
   methods: {
     ...mapMutations({
-      setUserInfo: 'SET_USERINFO'
+      setUserInfo: 'SET_USERINFO',
+      setLoginVisiable: 'SET_LOGINVISIABLE',
+      setLoginFlag: 'SET_LOGINFLAG'
     }),
     close() {
-      this.$emit('loginForm', false)
+      this.setLoginVisiable(false)
     },
     changeFlag(flag) {
-      this.$emit('changeFlag', flag)
+      this.setLoginFlag(flag)
       this.$refs.loginForm.resetFields()
     },
     otherLogin(name) {
@@ -154,7 +149,7 @@ export default {
               // 存入token
               localStorage.setItem('token', token)
               this.setUserInfo({userInfo, status: true})
-              this.$emit('loginForm', false)
+              this.setLoginVisiable(false)
             } else {
               this.$message.error(res.data.message)
             }

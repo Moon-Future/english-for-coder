@@ -14,10 +14,13 @@
           <el-dropdown trigger="click">
             <div class="avatar">
               <span>{{ userInfo.name }}</span>
-              <img :src="avatar" alt="">
+              <img :src="userInfo.avatar || avatar" alt="">
             </div>
             <el-dropdown-menu slot="dropdown" class="user-menu">
-              <el-dropdown-item @click.native="edit">
+              <el-dropdown-item v-if="userInfo.root">
+                <Iconfont icon="icon-guanliyuan"></Iconfont><router-link to="/admin/words">后台管理</router-link>
+              </el-dropdown-item>
+              <el-dropdown-item>
                 <Iconfont icon="icon-edit"></Iconfont>设置
               </el-dropdown-item>
               <el-dropdown-item @click.native="logout">
@@ -29,7 +32,7 @@
       </ul>
     </div>
     <div v-if="formStatus">
-      <Login :visiable="loginVisiable" :loginFlag="loginFlag" @loginForm="loginForm" @changeFlag="changeFlag"></Login>
+      <Login></Login>
       <word-form :visiable="formVisiable" :admin="false" :form="form" @wordForm="wordForm"></word-form>
     </div>
   </div>
@@ -84,29 +87,21 @@ export default {
       }
     },
     login() {
-      this.loginVisiable = true
-      this.loginFlag = true
+      this.setLoginVisiable(true)
+      this.setLoginFlag(true)
     },
     register() {
-      this.loginVisiable = true
-      this.loginFlag = false
-    },
-    edit() {
-      this.loginVisiable = true
-      this.loginFlag = false
-    },
-    loginForm(flag) {
-      this.loginVisiable = flag
-    },
-    changeFlag(flag) {
-      this.loginFlag = flag
+      this.setLoginVisiable(true)
+      this.setLoginFlag(false)
     },
     logout() {
       localStorage.removeItem('token')
       this.setUserInfo({userInfo: {}, status: false})
     },
     ...mapMutations({
-      setUserInfo: 'SET_USERINFO'
+      setUserInfo: 'SET_USERINFO',
+      setLoginVisiable: 'SET_LOGINVISIABLE',
+      setLoginFlag: 'SET_LOGINFLAG'
     })
   }
 }
@@ -142,9 +137,10 @@ export default {
         cursor: pointer;
         display: flex;
         img {
-          width: 50px;
-          height: 50px;
+          width: 40px;
+          height: 40px;
           border-radius: 50%;
+          margin: auto 0 auto 5px;
         }
       }
     }

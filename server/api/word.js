@@ -5,30 +5,30 @@ const shortid = require('shortid')
 
 router.get('/wordsList', async (ctx) => {
   try {
-    const data = ctx.request.query
-    const { search, word, admin } = data
-    let letter = data.letter
+    const params = ctx.request.query
+    const { search, word, admin } = params
+    let letter = params.letter
     let sql, res, temp ={}, result = []
     if (!search) {
       if (letter === 'hot') {
-        sql = `SELECT a.id, a.word, a.letter, a.mean, a.pronounce, e.id AS eid, e.en, e.zh, u.id AS userID, u.name, u.avatar FROM words AS a 
-          LEFT JOIN examples AS e ON a.id = e.wordID AND e.off != 1 
+        sql = `SELECT a.id, a.word, a.letter, a.mean, a.pronounce, e.id AS eid, e.en, e.zh, u.id AS userID, u.name, u.avatar FROM word AS a 
+          LEFT JOIN word_example AS e ON a.id = e.wordID AND e.off != 1 
           LEFT JOIN user AS u ON a.userID = u.id
           WHERE a.off != 1 AND ${admin ? 'true AND' : 'a.verify = 1 AND'} a.counter >= 10`
       } else if (letter === 'all') {
-        sql = `SELECT a.id, a.word, a.letter, a.mean, a.pronounce, a.verify, e.id AS eid, e.en, e.zh, u.id AS userID, u.name, u.avatar FROM words AS a 
-          LEFT JOIN examples AS e ON a.id = e.wordID AND e.off != 1 
+        sql = `SELECT a.id, a.word, a.letter, a.mean, a.pronounce, a.verify, e.id AS eid, e.en, e.zh, u.id AS userID, u.name, u.avatar FROM word AS a 
+          LEFT JOIN word_example AS e ON a.id = e.wordID AND e.off != 1 
           LEFT JOIN user AS u ON a.userID = u.id
           WHERE a.off != 1 AND ${admin ? 'true' : 'a.verify = 1'}`
       } else {
-        sql = `SELECT a.id, a.word, a.letter, a.mean, a.pronounce, e.id AS eid, e.en, e.zh, u.id AS userID, u.name, u.avatar FROM words AS a 
-          LEFT JOIN examples AS e ON a.id = e.wordID AND e.off != 1 
+        sql = `SELECT a.id, a.word, a.letter, a.mean, a.pronounce, e.id AS eid, e.en, e.zh, u.id AS userID, u.name, u.avatar FROM word AS a 
+          LEFT JOIN word_example AS e ON a.id = e.wordID AND e.off != 1 
           LEFT JOIN user AS u ON a.userID = u.id 
           WHERE a.off != 1 AND ${admin ? 'true AND' : 'a.verify = 1 AND'} a.letter = ?`
       }
     } else {
-      sql = `SELECT a.id, a.word, a.letter, a.mean, a.pronounce, e.id AS eid, e.en, e.zh, u.id AS userID, u.name, u.avatar FROM words AS a 
-        LEFT JOIN examples AS e ON a.id = e.wordID AND e.off != 1 
+      sql = `SELECT a.id, a.word, a.letter, a.mean, a.pronounce, e.id AS eid, e.en, e.zh, u.id AS userID, u.name, u.avatar FROM word AS a 
+        LEFT JOIN word_example AS e ON a.id = e.wordID AND e.off != 1 
         LEFT JOIN user AS u ON a.userID = u.id 
         WHERE a.off != 1 AND ${admin ? 'true AND' : 'a.verify = 1 AND'} a.word LIKE ?`
       letter = `%${word.trim()}%`
@@ -71,14 +71,14 @@ router.post('/editWord', async (ctx) => {
     letter = word[0].toLocaleUpperCase()
     if (id) {
       if (data.operate === '3') { // 删除
-        await query(`UPDATE words SET off = 1 WHERE id = ?`, [id])
-        await query(`UPDATE examples SET off = 1 WHERE wordID = ?`, [id])
+        await query(`UPDATE word SET off = 1 WHERE id = ?`, [id])
+        await query(`UPDATE word_example SET off = 1 WHERE wordID = ?`, [id])
       } else if (data.operate === '1') { // 更新
-        await query(`UPDATE words SET word = ?, letter = ?, mean = ?, pronounce = ?, updateTime = ? WHERE id = ?`, [word, letter, mean, pronounce, date, id])
+        await query(`UPDATE word SET word = ?, letter = ?, mean = ?, pronounce = ?, updateTime = ? WHERE id = ?`, [word, letter, mean, pronounce, date, id])
       }
     } else {
       id = shortid.generate()
-      await query(`INSERT INTO words (id, word, letter, mean, pronounce, userID, createTime, verify) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, 
+      await query(`INSERT INTO word (id, word, letter, mean, pronounce, userID, createTime, verify) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, 
         [id, word, letter, mean, pronounce, data.userID, date, admin ? 1 : 0])
     }
     for (let i = 0, len = examples.length; i < len; i++) {
@@ -88,14 +88,14 @@ router.post('/editWord', async (ctx) => {
       const zh = example.zh.trim()
       if (exid) {
         if (example.operate === '3') { // 删除
-          await query(`UPDATE examples SET off = 1 WHERE id = ?`, [exid])
+          await query(`UPDATE word_example SET off = 1 WHERE id = ?`, [exid])
         } else if (example.operate === '1') { // 更新
           if (en === '') { continue }
-          await query(`UPDATE examples SET en = ?, zh = ?, updateTime = ? WHERE id = ?`, [en, zh, date, exid])
+          await query(`UPDATE word_example SET en = ?, zh = ?, updateTime = ? WHERE id = ?`, [en, zh, date, exid])
         }
       } else {
         if (en === '') { continue }
-        await query(`INSERT INTO examples (id, wordID, en, zh, createTime) VALUES (?, ?, ?, ?, ?)`, 
+        await query(`INSERT INTO word_example (id, wordID, en, zh, createTime) VALUES (?, ?, ?, ?, ?)`, 
           [shortid.generate(), id, en, zh, date])
       }
     }
@@ -108,7 +108,7 @@ router.post('/editWord', async (ctx) => {
 router.post('/changeVerify', async (ctx) => {
   try {
     const data = ctx.request.body
-    await query(`UPDATE words SET verify = ? WHERE id = ?`, [data.verify, data.id])
+    await query(`UPDATE word SET verify = ? WHERE id = ?`, [data.verify, data.id])
     ctx.body = {code: 1, message: '成功'}
   } catch(err) {
     throw new Error(err)

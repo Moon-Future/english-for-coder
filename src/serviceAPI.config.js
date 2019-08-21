@@ -5,5 +5,7 @@ module.exports = {
   register: '/api/user/register',
   login: '/api/user/login',
   getUserInfo: '/api/user/getUserInfo',
-  getUserMore: '/api/user/getUserMore'
+  getUserMore: '/api/user/getUserMore',
+  writeComment: '/api/comment/writeComment',
+  getComment: '/api/comment/getComment'
 }
