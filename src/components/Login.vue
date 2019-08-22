@@ -17,7 +17,7 @@
             </template>
             <template v-else>
               <el-input 
-                :type="field.prop === 'password' || field.prop === 'rePassword' ? 'text' : 'text'"
+                :type="field.prop === 'password' || field.prop === 'rePassword' ? 'password' : 'text'"
                 v-if="field.prop !== 'website'" 
                 v-model="form[field.prop]" 
                 :placeholder="field.login || field.placeholder" @keyup.enter.native="login"></el-input>
@@ -128,6 +128,7 @@ export default {
       this.$refs.loginForm.resetFields()
     },
     otherLogin(name) {
+      this.$loading()
       const client_id = window.location.host.includes('localhost') ? 'd5f5205584c80bdb5f16' : '5b329c08da31f808bd35'
       if (name === 'github') {
         var href = `https://github.com/login/oauth/authorize?client_id=${client_id}&scope=user:email`

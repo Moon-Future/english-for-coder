@@ -14,6 +14,8 @@
               :limit="1"
               :show-file-list="false"
               :before-upload="beforeUpload"
+              :on-progress="uploadProgress"
+              :on-error="uploadError"
               :on-success="uploadSuccess">
               <el-button size="mini" type="primary">选择文件</el-button>
               <div slot="tip">只能上传jpg/png文件，且不超过500kb</div>
@@ -42,13 +44,13 @@
         <h1>修改密码</h1>
         <el-form ref="passwordForm" :model="passwordForm" :rules="passwordRules" class="form" width="500px" label-position="left">
           <el-form-item label="原密码" prop="old" label-width="80px">
-            <el-input v-model="passwordForm.old"></el-input>
+            <el-input type="password" v-model="passwordForm.old"></el-input>
           </el-form-item>
           <el-form-item label="新密码" prop="new" label-width="80px">
-            <el-input v-model="passwordForm.new"></el-input>
+            <el-input type="password" v-model="passwordForm.new"></el-input>
           </el-form-item>
           <el-form-item label="新密码" prop="reNew" label-width="80px">
-            <el-input v-model="passwordForm.reNew"></el-input>
+            <el-input type="password" v-model="passwordForm.reNew"></el-input>
           </el-form-item>
         </el-form>
         <el-button class="submit-btn" size="mini" type="primary" @click="updateSubmit('passwordForm')" :loading="submitting2">保存</el-button>
@@ -152,8 +154,12 @@ export default {
       }
       return isJPG && isLt2M
     },
+    uploadProgress() {
+      this.loadingMask = this.$loading()
+    },
     uploadSuccess(res) {
       this.$refs.upload.clearFiles()
+      this.loadingMask.close()
       if (res.code === 1) {
         let userInfo = this.userInfo
         userInfo.avatar = res.data.avatar
@@ -163,6 +169,11 @@ export default {
       } else {
         this.$message.error(res.message)
       }
+    },
+    uploadError() {
+      this.$refs.upload.clearFiles()
+      this.loadingMask.close()
+      this.$message.error('上次失败')
     },
     updateSubmit(form) {
       this.$refs[form].validate(valid => {
@@ -194,7 +205,7 @@ export default {
           flag = true
         }
         if (!flag) {
-          this.$message.error('无需更新')
+          this.$message.success('无需更新')
           return
         }
         if (form === 'infoForm') {

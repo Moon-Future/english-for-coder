@@ -104,7 +104,9 @@ export default {
     logout() {
       localStorage.removeItem('token')
       this.setUserInfo({userInfo: {}, status: false})
-      this.$router.push({path: '/'})
+      if (this.$route.path !== '/') {
+        this.$router.push({path: '/'})
+      }
     },
     goPage(path) {
       if (this.$route.path === path) {
