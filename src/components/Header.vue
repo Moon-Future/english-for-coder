@@ -3,6 +3,7 @@
     <div class="hedaer-menu">
       <router-link class="header-logo" to="/">English 4 Coder</router-link>
       <ul class="menu-wrapper">
+        <li><a class="github" href="https://github.com/Moon-Future/english-for-coder" target="_blank">Github</a></li>
         <li @click="add" v-if="formStatus">
           <Iconfont icon="icon-contribute"></Iconfont>
           <span>贡献</span>
@@ -127,41 +128,41 @@ export default {
 @import '@/common/css/variable.scss';
 .header-container {
   border-bottom: 1px solid $color-shallowgray;
-  
-  .hedaer-menu {
-    display: flex;
-    justify-content: space-between;
-    height: 50px;
-    line-height: 50px;
-    padding: 0 10px;
-    .header-logo {
+}
+
+.hedaer-menu {
+  display: flex;
+  justify-content: space-between;
+  height: 50px;
+  line-height: 50px;
+  padding: 0 10px;
+  .header-logo {
+    cursor: pointer;
+  }
+}
+
+.menu-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  li {
+    margin: 0 10px;
+    color: $color-blue;
+    font-weight: bold;
+    span {
+      font-weight: bold;
       cursor: pointer;
     }
-  }
-
-  .menu-wrapper {
-    display: flex;
-    justify-content: flex-end;
-    li {
-      margin: 0 10px;
-      color: $color-blue;
-      font-weight: bold;
-      span {
-        font-weight: bold;
-        cursor: pointer;
-      }
-      .menu-item-login::after {
-        content: ' · '
-      }
-      &.user-wrapper .avatar {
-        cursor: pointer;
-        display: flex;
-        img {
-          width: 40px;
-          height: 40px;
-          border-radius: 50%;
-          margin: auto 0 auto 5px;
-        }
+    .menu-item-login::after {
+      content: ' · '
+    }
+    &.user-wrapper .avatar {
+      cursor: pointer;
+      display: flex;
+      img {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        margin: auto 0 auto 5px;
       }
     }
   }
@@ -171,5 +172,9 @@ export default {
   li {
     color: $color-gray;
   }
+}
+
+.github {
+  font-weight: bold;
 }
 </style>
