@@ -19,8 +19,10 @@
         @click.native="getComment(word)">
         <template slot="title">
           <h1 class="word-title">{{ word.word }}</h1>
-          <Iconfont icon="icon-speaker" fontSize="20" class="icon-speaker" @click.native.stop="speaker(word.word)"></Iconfont>
-          <span class="word-item word-pronounce">{{ word.pronounce }}</span>
+          <div class="spaker-wrapper" @click.stop="speaker(word.word)">
+            <Iconfont icon="icon-speaker" fontSize="20" class="icon-speaker"></Iconfont>
+            <span class="word-item word-pronounce">{{ word.pronounce }}</span>
+          </div>
           <span class="word-item word-mean">{{ word.mean }}</span>
           <el-popover
             placement="left"
@@ -242,6 +244,9 @@ export default {
         color: $color-blue;
         font-weight: bold;
       }
+    }
+    .spaker-wrapper {
+      display: flex;
     }
     .icon-speaker {
       color: $color-blue;
