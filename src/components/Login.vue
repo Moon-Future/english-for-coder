@@ -20,7 +20,7 @@
                 :type="field.prop === 'password' || field.prop === 'rePassword' ? 'text' : 'text'"
                 v-if="field.prop !== 'website'" 
                 v-model="form[field.prop]" 
-                :placeholder="field.login || field.placeholder"></el-input>
+                :placeholder="field.login || field.placeholder" @keyup.enter.native="login"></el-input>
               <el-input v-else 
                 type="textarea" 
                 resize="none"
@@ -31,7 +31,7 @@
           </el-form-item>
         </template>
       </el-form>
-      <el-button class="submit-btn" type="primary" @click.native="submit">{{ loginFlag ? '登陆' : '注册' }}</el-button>
+      <el-button class="submit-btn" type="primary" :loading="submitting" @click.native="submit">{{ loginFlag ? '登陆' : '注册' }}</el-button>
       <div class="form-message" v-show="loginFlag">
         <span>没有账号？</span>
         <span class="span-link" @click="changeFlag(false)">注册</span>
@@ -60,6 +60,7 @@ export default {
   data() {
     const pattern = /^[\w._-]{6,16}$/
     return {
+      submitting: false,
       form: {
         account: '',
         password: '',
@@ -78,7 +79,8 @@ export default {
       ],
       rules: {
         account: [
-          {type: 'email', required: true, message: '请输入正确的邮箱', trigger: 'blur'}
+          {type: 'email', required: true, message: '请输入正确的邮箱', trigger: 'blur'},
+          {min: 1, max: 100, message: '长度在 1 到 100 个字符', trigger: 'blur'}
         ],
         password: [
           {required: true, validator: (rule, value, callback) => {
@@ -103,7 +105,8 @@ export default {
           }}
         ],
         name: [
-          {required: true, message: '请输入昵称', trigger: 'blur'}
+          {required: true, message: '请输入昵称', trigger: 'blur'},
+          {min: 1, max: 10, message: '长度在 1 到 10 个字符', trigger: 'blur'}
         ]
       }
     }
@@ -131,12 +134,19 @@ export default {
         window.location.href = href
       }
     },
+    login() {
+      if (!this.loginFlag) {
+        return
+      }
+      this.submit()
+    },
     submit() {
       const { account, password } = this.form
       this.$refs.loginForm.validate((valid) => {
-        if (!valid) {
+        if (!valid || this.submitting) {
           return false
         }
+        this.submitting = true
         if (this.loginFlag) { // 登陆
           this.$http.post(API.login, {
             account: this.form.account,
@@ -153,6 +163,7 @@ export default {
             } else {
               this.$message.error(res.data.message)
             }
+            this.submitting = false
           })
         } else { // 注册
           this.$http.post(API.register, {
@@ -170,6 +181,7 @@ export default {
             } else {
               this.$message.error(res.data.message)
             }
+            this.submitting = false
           })
         }
       })

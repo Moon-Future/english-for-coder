@@ -19,7 +19,7 @@
         v-model="comment">
       </el-input>
       <footer>还可输入 {{ rest }}/500 字</footer>
-      <el-button class="submit-btn" size="mini" type="primary" @click="submit">提交</el-button>
+      <el-button class="submit-btn" size="mini" type="primary" :loading="submitting" @click="submit">提交</el-button>
     </div>
   </div>
 </template>
@@ -68,11 +68,11 @@ export default {
       }
     },
     submit() {
-      console.log(this.comment.trim())
       const comment = this.comment.trim().slice(0, 500)
       if (comment === '' || this.submitting) {
         return
       }
+      this.submitting = true
       this.$http.post(API.writeComment, {
         comment,
         userID: this.userInfo.id,
@@ -95,6 +95,7 @@ export default {
           this.comment = ''
           this.showFlag = false
         }
+        this.submitting = false
       })
     },
     ...mapMutations({

@@ -107,6 +107,9 @@ export default {
       this.$router.push({path: '/'})
     },
     goPage(path) {
+      if (this.$route.path === path) {
+        return
+      }
       this.$router.push({path})
     },
     ...mapMutations({

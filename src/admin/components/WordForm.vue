@@ -44,7 +44,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button size="mini" @click="cancel">取 消</el-button>
-        <el-button size="mini" type="primary" @click="ok">确 定</el-button>
+        <el-button size="mini" type="primary" :loading="submitting" @click="ok">确 定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -58,10 +58,6 @@ export default {
   name: 'wordForm',
   props: {
     visiable: {
-      type: Boolean,
-      default: false
-    },
-    admin: {
       type: Boolean,
       default: false
     },
@@ -83,7 +79,8 @@ export default {
         {prop: 'pronounce', label: '发音'},
         {prop: 'examples', label: '实例'}
       ],
-      delExamples: []
+      delExamples: [],
+      submitting: false
     }
   },
   computed: {
@@ -115,6 +112,9 @@ export default {
       this.$emit('wordForm', false)
     },
     ok() {
+      if (this.submitting) {
+        return
+      }
       if (this.form.word.trim() === '') {
         this.$message.error('“单词”项必填')
         return
@@ -135,7 +135,7 @@ export default {
         this.form.examples = this.form.examples.concat(this.delExamples)
       }
       this.form.userID = this.userInfo.id || ''
-      this.form.admin = this.admin
+      this.submitting = true
       this.$http.post(API.editWord, this.form).then(res => {
         if (res.data.code === 1) {
           this.$message.success(res.data.message)
@@ -143,6 +143,7 @@ export default {
         } else {
           this.$message.error(res.data.message)
         }
+        this.submitting = false
       })
     }
   },

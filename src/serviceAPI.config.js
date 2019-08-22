@@ -7,5 +7,7 @@ module.exports = {
   getUserInfo: '/api/user/getUserInfo',
   getUserMore: '/api/user/getUserMore',
   writeComment: '/api/comment/writeComment',
-  getComment: '/api/comment/getComment'
+  getComment: '/api/comment/getComment',
+  upload: '/api/user/upload',
+  updateUserInfo: '/api/user/updateUserInfo'
 }

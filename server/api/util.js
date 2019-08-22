@@ -9,8 +9,8 @@ function checkToken(ctx) {
     return false
   }
   try {
-    jwt.verify(token.split(' ')[1], tokenConfig.privateKey)
-    return true
+    const userInfo = jwt.verify(token.split(' ')[1], tokenConfig.privateKey)
+    return userInfo
   } catch(err) {
     return false
   }
