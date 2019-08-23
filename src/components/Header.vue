@@ -138,6 +138,7 @@ export default {
   padding: 0 10px;
   .header-logo {
     cursor: pointer;
+    font-family: rubik, arial;
   }
 }
 

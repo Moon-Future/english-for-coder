@@ -43,7 +43,7 @@
       <div class="other-login">
         <p>第三方账号登陆：</p>
         <div class="other-list">
-          <img src="https://b-gold-cdn.xitu.io/v3/static/img/wechat.e0ff124.svg" alt="">
+          <!-- <img src="https://b-gold-cdn.xitu.io/v3/static/img/wechat.e0ff124.svg" alt=""> -->
           <img src="https://b-gold-cdn.xitu.io/v3/static/img/github.547dd8a.svg" alt="" @click="otherLogin('github')">
         </div>
       </div>
