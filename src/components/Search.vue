@@ -4,10 +4,12 @@
       <img alt="Vue logo" src="../assets/logo.png">
     </div>
     <div class="search-wrapper">
-      <img alt="Vue logo" src="../assets/logo.png">
-      <el-input class="search-inp" :clearable="true" v-model="input" placeholder="请输入单词查询" @keyup.enter.native="search">
-        <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
-      </el-input>
+      <div class="logo-search">
+        <img alt="Vue logo" src="../assets/logo.png">
+        <el-input class="search-inp" :clearable="true" v-model="input" placeholder="请输入单词查询" @keyup.enter.native="search">
+          <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
+        </el-input>
+      </div>
     </div>
   </div>
 </template>
@@ -38,7 +40,7 @@ export default {
 <style lang="scss" scoped>
 @import '@/common/css/variable.scss';
 .search-container {
-  margin-top: 20px;
+  margin-top: 60px;
   .logo img {
     width: 300px;
   }
@@ -46,15 +48,15 @@ export default {
     display: flex;
     justify-content: center;
     position: relative;
+  }
+  .logo-search {
+    width: 50%;
+    display: flex;
     img {
       height: 40px;
       margin-right: 20px;
-      position: absolute;
-      left: 12%;
-      opacity: 0;
-    }
-    .search-inp {
-      width: 40%;
+      display: none;
+      // opacity: 0;
     }
   }
 }

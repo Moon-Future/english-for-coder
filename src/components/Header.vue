@@ -127,6 +127,12 @@ export default {
 <style lang="scss" scoped>
 @import '@/common/css/variable.scss';
 .header-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: $color-white;
+  z-index: 99;
   border-bottom: 1px solid $color-shallowgray;
 }
 

@@ -1,6 +1,6 @@
 <template>
   <div class="wordform-container">
-    <el-dialog :visible.sync="visiable" :close-on-click-modal="false" @close="close">
+    <el-dialog :visible.sync="visiable" :modal-append-to-body="false" :close-on-click-modal="false" @close="close">
       <el-form close-on-click-modal="false" label-width="80px">
         <el-form-item 
           v-for="(field, i) in fields"

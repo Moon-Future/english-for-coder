@@ -34,7 +34,7 @@ export default {
   width: 80%;
   height: 40px;
   line-height: 40px;
-  margin: auto;
+  margin: 60px auto;
   display: flex;
   justify-content: flex-start;
   li {
