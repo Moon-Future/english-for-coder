@@ -138,7 +138,7 @@ router.post('/exportWord', async (ctx) => {
   try {
     const jsonData = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../data.json'), 'utf-8'))
     for (let i = 0, len = jsonData.length; i < len; i++) {
-      if (jsonData[i].id) {
+      if (jsonData[i].id || jsonData[i].word === '') {
         continue
       }
       let item = jsonData[i]
