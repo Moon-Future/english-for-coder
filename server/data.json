@@ -1,13 +1,50 @@
 [
   {
     "word": "vue",
-    "mean": "框架",
-    "pronounce": "/vju/",
+    "mean": "用于构建用户界面的渐进式框架",
+    "pronounce": "/vjuː/",
     "examples": [
       {
         "en": "Vue.js is a JavaScript framework for building interactive web applications.",
-        "zh": ""
+        "zh": "Vue.js 是一个用于构建交互式 Web 应用程序的 JavaScript 框架",
+        "id": "jv0Npt0emP"
+      },
+      {
+        "en": "Vue (pronounced /vjuː/, like view) is a progressive framework for building user interfaces.",
+        "zh": "Vue (读音 /vjuː/，类似于 view) 是一套用于构建用户界面的渐进式框架。",
+        "id": "DrNiiDuJ6O"
       }
-    ]
+    ],
+    "id": "CPkNIV--8"
+  },
+  {
+    "word": "progressive",
+    "mean": "渐进式; adj. 不断前进的, 有进展的, 逐渐上升的",
+    "pronounce": "/prə'gresɪv/ ",
+    "examples": [
+      {
+        "en": "a progressive framework",
+        "zh": "渐进式框架。",
+        "id": "BPVYlZ_pWC"
+      },
+      {
+        "en": "Progressive web apps",
+        "zh": "PWA, 渐进式 Web 应用",
+        "id": "Dqp378-4A-"
+      }
+    ],
+    "id": "P3oKD4-3-_"
+  },
+  {
+    "word": "RegExp",
+    "mean": "正则表达式 Regular expression",
+    "pronounce": "/regjʊ'leɪʃ(ə)n/ /ɪk'spreʃ(ə)n/",
+    "id": "iINNiULZ7a"
+  },
+  {
+    "word": "reactivity",
+    "mean": "响应, 反应; reactivity system 响应式系统",
+    "pronounce": "/ˌriæk'tivəti/",
+    "id": "wbs9YwvSc7"
   }
 ]

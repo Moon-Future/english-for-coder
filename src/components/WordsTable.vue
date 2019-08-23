@@ -1,6 +1,7 @@
 <template>
   <div class="wordstbl-container">
     <div class="btn-wrapper">
+      <el-button v-if="userInfo.root" type="primary" size="mini" @click="exportJsonData">导入数据</el-button>
       <el-button type="primary" size="mini" @click="add">添加新词汇</el-button>
     </div>
     <el-table
@@ -118,6 +119,22 @@ export default {
         pronounce: '',
         examples: []
       }
+    },
+    exportJsonData() {
+      this.$confirm('确认导入数据? 请注意是否重复', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$http.post(API.exportWord).then(res => {
+          this.$message({
+            type: res.data.code === 1 ? 'success' : 'error',
+            message: res.data.message
+          })
+        })
+      }).catch(() => {
+        this.$message.info('已取消')          
+      });
     },
     edit(index, data) {
       delete data.origin

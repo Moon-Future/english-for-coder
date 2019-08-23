@@ -1,3 +1,5 @@
+const fs = require('fs')
+const path = require('path')
 const Router = require('koa-router')
 const router = new Router()
 const query = require('../database/init')
@@ -29,6 +31,7 @@ router.get('/wordsList', async (ctx) => {
       sql += 'AND a.word LIKE ?'
       letter = `%${word.trim()}%`
     }
+    sql += ' ORDER BY a.createTime'
     res = await query(sql, [letter])
 
     res.forEach(item => {
@@ -121,6 +124,38 @@ router.post('/changeVerify', async (ctx) => {
     const data = ctx.request.body
     await query(`UPDATE word SET verify = ? WHERE id = ?`, [data.verify, data.id])
     ctx.body = {code: 1, message: '成功'}
+  } catch(err) {
+    throw new Error(err)
+  }
+})
+
+router.post('/exportWord', async (ctx) => {
+  const userInfo = checkToken(ctx)
+  if (!userInfo || !userInfo.root) {
+    ctx.body = {code: 0, message: '没有权限'}
+    return
+  }
+  try {
+    const jsonData = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../data.json'), 'utf-8'))
+    for (let i = 0, len = jsonData.length; i < len; i++) {
+      if (jsonData[i].id) {
+        continue
+      }
+      let item = jsonData[i]
+      let { word, mean, pronounce, examples = [] } = item
+      let letter = word[0].toLocaleUpperCase()
+      let id = shortid.generate()
+      item.id = id
+      await query(`INSERT INTO word (id, word, letter, mean, pronounce, createTime, verify) VALUES (?, ?, ?, ?, ?, ?, ?)`, 
+        [id, word, letter, mean, pronounce, Date.now(), 1])
+      for (let j = 0; j < examples.length; j++) {
+        examples[j].id = shortid.generate()
+        await query(`INSERT INTO word_example (id, wordID, en, zh, createTime) VALUES (?, ?, ?, ?, ?)`, 
+          [examples[j].id, id, examples[j].en, examples[j].zh, Date.now()])
+      }
+    }
+    fs.writeFileSync(path.resolve(__dirname, '../data.json'), JSON.stringify(jsonData), 'utf-8')
+    ctx.body = {code: 1, message: '导入完成'}
   } catch(err) {
     throw new Error(err)
   }
