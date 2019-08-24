@@ -136,7 +136,13 @@ router.post('/exportWord', async (ctx) => {
     return
   }
   try {
-    const jsonData = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../data.json'), 'utf-8'))
+    let jsonData = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../data.json'), 'utf-8'))
+    // jsonData = jsonData.filter((item) => {
+    //   return item.word !== ''
+    // })
+    // jsonData.sort((a, b) => {
+    //   return a.word[0].toLocaleUpperCase().charCodeAt() - b.word[0].toLocaleUpperCase().charCodeAt()
+    // })
     for (let i = 0, len = jsonData.length; i < len; i++) {
       if (jsonData[i].id || jsonData[i].word === '') {
         continue
