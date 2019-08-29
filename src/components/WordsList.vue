@@ -2,7 +2,7 @@
   <div class="wordsls-container">
     <div class="alphabet-wrapper">
       <span :class="activeIndex === -2 ? 'active' : ''" @click="selectLetter(-2, 'all')">All</span>
-      <Iconfont icon="icon-hot" class="icon-hot" :class="activeIndex === -1 ? 'active' : ''" @click.native="selectLetter(-1, 'hot')"></Iconfont>
+      <!-- <Iconfont icon="icon-hot" class="icon-hot" :class="activeIndex === -1 ? 'active' : ''" @click.native="selectLetter(-1, 'hot')"></Iconfont> -->
       <span 
         v-for="(letter, i) in letterList" 
         :key="i" 
@@ -10,7 +10,7 @@
         @click="selectLetter(i, letter)">{{ letter }}</span>
     </div>
     <el-collapse class="collapse-wrapper" @change="open">
-      <p class="words-none" v-if="wordsList.length === 0">暂无数据</p>
+      <p class="words-none" v-if="wordsList && wordsList.length === 0">暂无数据</p>
       <el-collapse-item
         v-for="word in wordsList"
         :key="word.id"
@@ -81,9 +81,9 @@ export default {
         'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 
       ],
       activeNames: [1],
-      wordsList: [],
+      wordsList: '',
       pronounceSrc: '',
-      activeIndex: -1,
+      activeIndex: -2,
       websiteMap: {},
       openList: [],
       commentMap: {},
@@ -94,7 +94,7 @@ export default {
     ...mapGetters(['keyWord'])
   },
   created() {
-    this.getWordsList({letter: 'hot'})
+    this.getWordsList({letter: 'all'})
   },
   methods: {
     getWordsList(params) {

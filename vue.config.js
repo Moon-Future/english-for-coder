@@ -1,3 +1,5 @@
+const CompressionPlugin = require('compression-webpack-plugin')
+
 module.exports = {
   devServer: {
     proxy: {
@@ -10,6 +12,7 @@ module.exports = {
       }
     }
   },
+  productionSourceMap: false,
   configureWebpack: {
     externals: {
       'vue': 'Vue',
@@ -18,4 +21,15 @@ module.exports = {
       'element-ui': 'ELEMENT',
      },
   },
+  configureWebpack: config => {
+    if (process.env.NODE_ENV === 'production') {
+      return {
+        plugins: [new CompressionPlugin({
+          test: /\.js$|\.html&|\.css/,
+          threshold: 10204,
+          deleteOriginalAssets: false
+        })]
+      }
+    }
+  }
 }
