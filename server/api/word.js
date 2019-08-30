@@ -4,7 +4,8 @@ const Router = require('koa-router')
 const router = new Router()
 const query = require('../database/init')
 const shortid = require('shortid')
-const { checkToken } = require('./util')
+const { checkToken, dateFormat } = require('./util')
+const { transporter, mailOptions } = require('./email')
 
 router.get('/wordsList', async (ctx) => {
   try {
@@ -89,6 +90,23 @@ router.post('/editWord', async (ctx) => {
       id = shortid.generate()
       await query(`INSERT INTO word (id, word, letter, mean, pronounce, userID, createTime, verify) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, 
         [id, word, letter, mean, pronounce, data.userID, date, admin ? 1 : 0])
+      if (!admin) {
+        mailOptions.subject = 'English4Coder 有新加入词汇，请尽快审核'
+        mailOptions.html = `
+          <h1>新加入词汇</h1>
+          <p>贡献者账户：${userInfo && userInfo.account || '未注册'}</p>
+          <p>贡献者昵称：${userInfo && userInfo.name || '未注册'}</p>
+          <p>贡献者ID：${userInfo && userInfo.id || '未注册'}</p>
+          <p>单词：${word}</p>
+          <p>词意：${mean}</p>
+          <p>时间: ${dateFormat(new Date(), 'yyyy-MM-dd hh:mm')}</p>
+        `
+        transporter.sendMail(mailOptions, (error, info) => {
+          if (error) {
+            return console.log(error);
+          }
+        })
+      }
     }
     for (let i = 0, len = examples.length; i < len; i++) {
       const example = examples[i]

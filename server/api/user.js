@@ -4,9 +4,9 @@ const query = require('../database/init')
 const shortid = require('shortid')
 const jwt = require('jsonwebtoken')
 const axios = require('axios')
-const { checkToken } = require('./util')
+const { checkToken, dateFormat } = require('./util')
 const { tokenConfig, githubConfig } = require('../secret')
-const { transporter, mailOptions, sendMsg } = require('./email')
+const { transporter, mailOptions } = require('./email')
 const cosUpload = require('./tencentCloud')
 
 function websiteFormat(str) {
@@ -54,17 +54,18 @@ router.post('/register', async (ctx) => {
         VALUES (?, ?, ?, ?, ?)`, [shortid.generate(), userID, item.name, item.url, date])
     }
     ctx.body = {code: 1, message: '注册成功'}
-    // mailOptions.html = `
-    //   <h1>${sendMsg.newUser}</h1>
-    //   <p>${sendMsg.email}: ${account}</p>
-    //   <p>${sendMsg.name}: ${name}</p>
-    //   <p>${sendMsg.time}: ${new Date()}</p>
-    // `
-    // transporter.sendMail(mailOptions, (error, info) => {
-    //   if (error) {
-    //     return console.log(error);
-    //   }
-    // })
+    mailOptions.subject = 'English4Coder 有新的注册用户'
+    mailOptions.html = `
+      <h1>新注册用户</h1>
+      <p>账户: ${account}</p>
+      <p>昵称: ${name}</p>
+      <p>时间: ${dateFormat(new Date(), 'yyyy-MM-dd hh:mm')}</p>
+    `
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        return console.log(error);
+      }
+    })
   } catch(err) {
     throw new Error(err)
   }
