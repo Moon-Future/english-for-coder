@@ -132,6 +132,24 @@ router.get('/getUserInfo', async (ctx) => {
   }
 })
 
+router.get('/getUser', async (ctx) => {
+  const userInfo = checkToken(ctx)
+  if (!userInfo) {
+    ctx.body = {code: 0, message: '请先登陆'}
+    return
+  }
+  if (!userInfo.root) {
+    ctx.body = {code: 0, message: '没有权限'}
+    return
+  }
+  try {
+    let rst = await query(`SELECT * FROM user WHERE off != 1`)
+    ctx.body = {code: 1, data: rst}
+  } catch(err) {
+    throw new Error(err)
+  }
+})
+
 // Github授权登陆
 router.get('/githubCallback', async (ctx) => {
   try {

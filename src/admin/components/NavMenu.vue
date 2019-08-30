@@ -1,13 +1,14 @@
 <template>
   <div class="menu-container">
     <el-menu
-      default-active="1"
+      :default-active="active"
       background-color="#545c64"
       text-color="#fff"
-      active-text-color="#ffd04b">
-      <el-menu-item index="1">
-        <i class="el-icon-collection"></i>
-        <span slot="title">词汇</span>
+      active-text-color="#ffd04b"
+      :router="true">
+      <el-menu-item v-for="menu in menuList" :index="menu.index" :key="menu.index">
+        <i :class="menu.icon"></i>
+        <span slot="title">{{ menu.name }}</span>
       </el-menu-item>
     </el-menu>
   </div>
@@ -15,7 +16,24 @@
 
 <script>
 export default {
-  name: 'navMenu'
+  name: 'navMenu',
+  data() {
+    return {
+      menuList: [
+        {icon: 'el-icon-collection', name: '词汇', index: '/admin/words'},
+        {icon: 'el-icon-collection', name: '用户', index: '/admin/user'}
+      ],
+      active: '/admin/words'
+    }
+  },
+  created() {
+    this.active = this.$route.path
+  },
+  watch: {
+    $route() {
+      this.active = this.$route.path
+    }
+  }
 }
 </script>
 

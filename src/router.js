@@ -1,6 +1,12 @@
 // import Vue from 'vue'
 import Home from './views/Home.vue'
 
+// 解决 【路由跳转相同地址】时报错：{_name: "NavigationDuplicated", name: "NavigationDuplicated"}
+const routerPush = VueRouter.prototype.push
+VueRouter.prototype.push = function push(location) {
+  return routerPush.call(this, location).catch(error=> error)
+}
+
 Vue.use(VueRouter)
 
 export default new VueRouter({
@@ -55,6 +61,15 @@ export default new VueRouter({
             root: true
           },
           component: () => import('./admin/views/Words'),
+        },
+        {
+          path: '/admin/user',
+          name: 'user',
+          meta: {
+            requireAuth: true,
+            root: true
+          },
+          component: () => import('./admin/views/User'),
         }
       ]
     }
